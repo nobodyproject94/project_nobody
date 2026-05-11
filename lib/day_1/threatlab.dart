@@ -21,11 +21,7 @@ class MyWidget extends StatelessWidget {
         children: [
           Text(
             'My Own Bussines',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.indigo,
-              fontStyle: FontStyle.italic,
-            ),
+            style: TextStyle(fontSize: 20, color: Colors.indigo, fontStyle: ),
           ),
           SizedBox(height: 20),
           SizedBox(width: 15),
