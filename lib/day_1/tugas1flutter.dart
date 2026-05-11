@@ -10,7 +10,7 @@ class MyWidget extends StatelessWidget {
       appBar: AppBar(title: Text('My Profile'), centerTitle: true),
       body: Column(
         children: [
-          const Text(
+          Text(
             "nama: nobody",
             style: TextStyle(
               fontWeight: FontWeight.bold,
