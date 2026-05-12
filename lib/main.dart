@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:project_nobody/day_1/mestronesia.dart';
+import 'package:project_nobody/day_1/maestronesia.dart';
+import 'package:project_nobody/day_1/tugas_flutter_3.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,6 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 146, 120, 192),
         ),
       ),
-      home: MyWidget(),
+      home: TugasFlutter3(),
     );
   }
 }
