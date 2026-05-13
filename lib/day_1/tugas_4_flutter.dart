@@ -72,8 +72,8 @@ class Tugas4Flutter extends StatelessWidget {
                   borderRadius: BorderRadius.circular(50),
                   child: Image.asset(
                     "assets/images/ford_ranger.avif",
-                    width: 45, // ✅ tambah ukuran
-                    height: 45, // ✅ tambah ukuran
+                    width: 45,
+                    height: 45,
                     fit: BoxFit.cover,
                   ),
                 ),
