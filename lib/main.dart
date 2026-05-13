@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 146, 120, 192),
         ),
       ),
-      home: Tugas2flutter(),
+      home: TugasFlutter3(),
     );
   }
 }

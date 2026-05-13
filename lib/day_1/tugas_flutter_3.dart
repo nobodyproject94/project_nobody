@@ -157,7 +157,7 @@ class TugasFlutter3 extends StatelessWidget {
                     ),
                     Positioned.fill(
                       child: ClipRRect(
-                        child: Image.asset('assets/images/ford_ranger.jpg'),
+                        child: Image.asset('assets/images/ford_ranger.avif'),
                       ),
                     ),
                     Positioned(
@@ -167,7 +167,7 @@ class TugasFlutter3 extends StatelessWidget {
                         color: Colors.white,
 
                         child: Text(
-                          'VolksWagen',
+                          'ForgRanger',
                           style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
@@ -194,7 +194,7 @@ class TugasFlutter3 extends StatelessWidget {
                     ),
                     Positioned.fill(
                       child: ClipRRect(
-                        child: Image.asset('assets/images/vw.jpg'),
+                        child: Image.asset('assets/images/lc toyota.jpg'),
                       ),
                     ),
                     Positioned(
@@ -204,7 +204,7 @@ class TugasFlutter3 extends StatelessWidget {
                         color: Colors.white,
 
                         child: Text(
-                          'VolksWagen',
+                          'LandCruiser',
                           style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
@@ -231,7 +231,7 @@ class TugasFlutter3 extends StatelessWidget {
                     ),
                     Positioned.fill(
                       child: ClipRRect(
-                        child: Image.asset('assets/images/vw.jpg'),
+                        child: Image.asset('assets/images/g class.jpg'),
                       ),
                     ),
                     Positioned(
@@ -241,7 +241,7 @@ class TugasFlutter3 extends StatelessWidget {
                         color: Colors.white,
 
                         child: Text(
-                          'VolksWagen',
+                          'G-Class',
                           style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
@@ -268,7 +268,7 @@ class TugasFlutter3 extends StatelessWidget {
                     ),
                     Positioned.fill(
                       child: ClipRRect(
-                        child: Image.asset('assets/images/vw.jpg'),
+                        child: Image.asset('assets/images/mini cooper.jpg'),
                       ),
                     ),
                     Positioned(
@@ -278,7 +278,7 @@ class TugasFlutter3 extends StatelessWidget {
                         color: Colors.white,
 
                         child: Text(
-                          'VolksWagen',
+                          'MiniCooper',
                           style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
@@ -298,26 +298,22 @@ class TugasFlutter3 extends StatelessWidget {
                       height: 90,
                       width: 90,
                       padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.indigo[900],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
                     ),
                     Positioned.fill(
                       child: ClipRRect(
-                        child: Image.asset('assets/images/vw.jpg'),
+                        child: Image.asset('assets/images/audi.jpg'),
                       ),
                     ),
                     Positioned(
                       bottom: 5,
                       child: Container(
                         padding: const EdgeInsets.all(2),
-                        color: Colors.white,
+                        color: Colors.indigo[900],
 
                         child: Text(
-                          'VolksWagen',
+                          'Audi',
                           style: const TextStyle(
-                            color: Colors.black,
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 10,
                           ),
