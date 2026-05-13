@@ -100,58 +100,232 @@ class TugasFlutter3 extends StatelessWidget {
             const SizedBox(height: 12),
             GridView.count(
               crossAxisCount: 3,
-              crossAxisSpacing: 2,
-              mainAxisSpacing: 2,
+              crossAxisSpacing: 3,
+              mainAxisSpacing: 3,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                Image.asset('assets/images/audi.jpg', fit: BoxFit.cover),
-                Image.asset(
-                  'assets/images/ford_ranger.avif',
-                  fit: BoxFit.cover,
-                ),
-                Image.asset('assets/images/g class.jpg', fit: BoxFit.cover),
-                Image.asset('assets/images/lc toyota.jpg', fit: BoxFit.cover),
-                Image.asset('assets/images/mini cooper.jpg', fit: BoxFit.cover),
-                Image.asset('assets/images/vw.jpg', fit: BoxFit.cover),
-              ],
-            ),
-            Stack(
-              alignment: AlignmentGeometry.bottomCenter,
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  height: 10,
-                  width: 10,
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.indigo[900],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                Positioned.fill(
-                  bottom: 5,
-                  left: 5,
-                  right: 5,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 100,
-                      vertical: 100,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 26, 35, 126),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    child: Text(
-                      'lebel',
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
+                Stack(
+                  alignment: AlignmentGeometry.bottomCenter,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      height: 90,
+                      width: 90,
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo[900],
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
+                    Positioned.fill(
+                      child: ClipRRect(
+                        child: Image.asset('assets/images/vw.jpg'),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 5,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        color: Colors.white,
+
+                        child: Text(
+                          'VolksWagen',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Stack(
+                  alignment: AlignmentGeometry.bottomCenter,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      height: 90,
+                      width: 90,
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo[900],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: ClipRRect(
+                        child: Image.asset('assets/images/ford_ranger.jpg'),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 5,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        color: Colors.white,
+
+                        child: Text(
+                          'VolksWagen',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Stack(
+                  alignment: AlignmentGeometry.bottomCenter,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      height: 90,
+                      width: 90,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo[900],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: ClipRRect(
+                        child: Image.asset('assets/images/vw.jpg'),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 10,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        color: Colors.white,
+
+                        child: Text(
+                          'VolksWagen',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Stack(
+                  alignment: AlignmentGeometry.bottomCenter,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      height: 90,
+                      width: 90,
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo[900],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: ClipRRect(
+                        child: Image.asset('assets/images/vw.jpg'),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 5,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        color: Colors.white,
+
+                        child: Text(
+                          'VolksWagen',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Stack(
+                  alignment: AlignmentGeometry.bottomCenter,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      height: 90,
+                      width: 90,
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo[900],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: ClipRRect(
+                        child: Image.asset('assets/images/vw.jpg'),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 5,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        color: Colors.white,
+
+                        child: Text(
+                          'VolksWagen',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Stack(
+                  alignment: AlignmentGeometry.bottomCenter,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      height: 90,
+                      width: 90,
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo[900],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: ClipRRect(
+                        child: Image.asset('assets/images/vw.jpg'),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 5,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        color: Colors.white,
+
+                        child: Text(
+                          'VolksWagen',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
