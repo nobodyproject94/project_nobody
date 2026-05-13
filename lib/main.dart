@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_nobody/day_1/maestronesia.dart';
+import 'package:project_nobody/day_1/tugas_4_flutter.dart';
 import 'package:project_nobody/day_1/tugas_flutter_3.dart';
 import 'package:project_nobody/day_1/stack.dart';
 import 'package:project_nobody/day_1/tugas2flutter.dart';
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 146, 120, 192),
         ),
       ),
-      home: TugasFlutter3(),
+      home: Tugas4Flutter(),
     );
   }
 }
