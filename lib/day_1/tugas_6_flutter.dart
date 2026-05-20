@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_nobody/day_1/extension/extension_navigator.dart';
+import 'package:project_nobody/day_1/tugas_4_flutter.dart';
 import 'package:project_nobody/day_1/tugas_5_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -177,7 +178,7 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
                 const SizedBox(height: 12),
 
                 const Text(
-                  'or sign up with',
+                  'or Sign up with',
                   style: TextStyle(color: Color.fromARGB(255, 231, 176, 9)),
                 ),
 
@@ -254,7 +255,7 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // Aksi ketika teks Log In diklik jika diperlukan
+                        context.push(Tugas4Flutter());
                       },
                       child: const Text(
                         "Log In",
