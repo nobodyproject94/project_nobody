@@ -18,7 +18,7 @@ class _Tugas5FlutterState extends State<Tugas5Flutter> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Dream Car',
+          'Home Page',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
@@ -37,7 +37,7 @@ class _Tugas5FlutterState extends State<Tugas5Flutter> {
               onPressed: () {
                 setState(() => showSecret = !showSecret);
               },
-              child: Text(showSecret ? 'Sembunyikan' : 'tampilkan'),
+              child: Text(showSecret ? 'Hide' : 'Show'),
             ),
             if (showSecret)
               Container(
@@ -48,7 +48,7 @@ class _Tugas5FlutterState extends State<Tugas5Flutter> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.indigoAccent),
                 ),
-                child: const Text('Ford Ranger'),
+                child: const Text('Dream Car'),
               ),
             const Divider(height: 32),
             Row(
@@ -75,7 +75,7 @@ class _Tugas5FlutterState extends State<Tugas5Flutter> {
                 setState(() => showDeskripsi = !showDeskripsi);
               },
               icon: Icon(showDeskripsi ? Icons.expand_less : Icons.expand_more),
-              label: Text(showDeskripsi ? 'Tampilkan' : 'Sembunyikan'),
+              label: Text(showDeskripsi ? 'Hide' : 'Show'),
             ),
             if (showDeskripsi)
               Container(
@@ -112,7 +112,7 @@ class _Tugas5FlutterState extends State<Tugas5Flutter> {
                   height: 80,
                   child: Center(
                     child: Text(
-                      'tap here',
+                      'Ford Ranger',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

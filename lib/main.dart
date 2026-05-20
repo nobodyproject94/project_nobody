@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:project_nobody/day_1/maestronesia.dart';
+import 'package:project_nobody/day_1/splashscreen_tugas6_flutter.dart';
 import 'package:project_nobody/day_1/tugas_4_flutter.dart';
 import 'package:project_nobody/day_1/tugas_5_flutter.dart';
 import 'package:project_nobody/day_1/tugas_6_flutter.dart';
 import 'package:project_nobody/day_1/tugas_flutter_3.dart';
-import 'package:project_nobody/day_1/stack.dart';
 import 'package:project_nobody/day_1/tugas2flutter.dart';
 
 void main() {
@@ -40,7 +39,12 @@ class MyApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 146, 120, 192),
         ),
       ),
-      home: Tugas6Flutter(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => Splashscreen(),
+        '/login': (context) => Tugas6Flutter(),
+      },
+      //home: Tugas6Flutter(),
     );
   }
 }
