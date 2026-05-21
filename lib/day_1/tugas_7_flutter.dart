@@ -114,7 +114,7 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
               children: [
                 DropdownButton<String>(
                   value: selectedDropDwon,
-                  items: ['Elektronik', 'Pakaian', 'Makanan', 'Lainnya']
+                  items: ['clothing', 'shelter', 'food', 'Lainnya']
                       .map(
                         (item) =>
                             DropdownMenuItem(value: item, child: Text(item)),
