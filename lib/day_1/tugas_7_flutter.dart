@@ -12,7 +12,7 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
   bool darkMode = false;
   String? selectedDropDwon;
   DateTime? selectedDate;
-  TimeOfDay? selctedDay;
+  TimeOfDay? selectedDay;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +85,9 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
                   ischeck ? "agreed" : "disagreed",
                   style: TextStyle(
                     fontSize: 16,
-                    color: darkMode ? Colors.amber : Colors.black,
+                    color: darkMode
+                        ? Colors.amber
+                        : const Color.fromARGB(255, 2, 1, 100),
                   ),
                 ),
               ],
@@ -114,7 +116,12 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
               children: [
                 DropdownButton<String>(
                   value: selectedDropDwon,
-                  items: ['clothing', 'shelter', 'food', 'Lainnya']
+                  dropdownColor: darkMode ? Colors.grey[900] : Colors.white,
+                  style: TextStyle(
+                    color: darkMode ? Colors.amber : Colors.black,
+                    fontSize: 16,
+                  ),
+                  items: ['clothing', 'shelter', 'food', 'others']
                       .map(
                         (item) =>
                             DropdownMenuItem(value: item, child: Text(item)),
@@ -128,7 +135,133 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
               ],
             ),
             //DATE TIME
-            Row(),
+            Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final DateTime? picked = await showDatePicker(
+                      context: context,
+                      initialDate: selectedDate ?? DateTime.now(),
+                      firstDate: DateTime(1800),
+                      lastDate: DateTime(2300),
+                    );
+                    if (picked != null) {
+                      setState(() => selectedDate = picked);
+                      {}
+                    }
+                  },
+                  icon: const Icon(Icons.calendar_today),
+                  label: const Text('pick date'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            if (selectedDate != null)
+              Text(
+                'Date of Birth: ${selectedDate!.day.toString().padLeft(2, '0')}-'
+                '${selectedDate!.month.toString().padLeft(2, '0')}-'
+                '${selectedDate!.year}',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: darkMode ? Colors.amber : Colors.black,
+                ),
+              ),
+            const SizedBox(height: 18),
+            // time picker
+            Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final TimeOfDay? picked = await showTimePicker(
+                      context: context,
+                      initialTime: selectedDay ?? TimeOfDay.now(),
+                    );
+                    if (picked != null) {
+                      setState(() => selectedDay = picked);
+                      {}
+                    }
+                  },
+                  icon: const Icon(Icons.alarm),
+                  label: const Text('set reminder'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            if (selectedDay != null)
+              Text(
+                'A reminder has been set for:'
+                '${selectedDay!.hour.toString().padLeft(2, '0')}:'
+                '${selectedDay!.minute.toString().padLeft(2, '0')}',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: darkMode ? Colors.amber : Colors.black,
+                ),
+              ),
+            const SizedBox(height: 25),
+            //RESULT
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: darkMode ? Colors.grey[800] : Colors.grey[800],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: darkMode
+                      ? Colors.amber
+                      : const Color.fromARGB(255, 2, 1, 100),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '📋 status summary',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: darkMode
+                          ? Colors.white
+                          : const Color.fromARGB(255, 255, 193, 7),
+                    ),
+                  ),
+                  const Divider(),
+                  Text(
+                    '• terms & conditions: ${ischeck ? "Registration is allowed ✅" : "Registration is not yet open ❌"}',
+                    style: TextStyle(
+                      color: darkMode ? Colors.white : Colors.amber,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '• display mode: ${darkMode ? "dark 🌙" : "light ☀️"}',
+                    style: TextStyle(
+                      color: darkMode ? Colors.white : Colors.amber,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '• category: ${selectedDropDwon ?? "Not yet selected"}',
+                    style: TextStyle(
+                      color: darkMode ? Colors.white : Colors.amber,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '• date of birth: ${selectedDate != null ? "${selectedDate!.day.toString().padLeft(2, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.year}" : "Belum dipilih"}',
+                    style: TextStyle(
+                      color: darkMode ? Colors.white : Colors.amber,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '• reminder: ${selectedDay != null ? "${selectedDay!.hour.toString().padLeft(2, '0')}:${selectedDay!.minute.toString().padLeft(2, '0')}" : "Belum diatur"}',
+                    style: TextStyle(
+                      color: darkMode ? Colors.white : Colors.amber,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
