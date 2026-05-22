@@ -92,7 +92,7 @@ class _Tugas8Flutter2gas5FlutterState extends State<Tugas8Flutter2> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(9),
                   child: Image.asset(
-                    'assets/images/ford_ranger.avif',
+                    'assets/images/maestronesialogo.png',
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
