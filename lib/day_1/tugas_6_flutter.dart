@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:project_nobody/day_1/about_app_screen.dart';
 import 'package:project_nobody/day_1/extension/extension_navigator.dart';
+import 'package:project_nobody/day_1/tugas_8_flutter.dart';
 import 'package:project_nobody/day_1/tugas_4_flutter.dart';
 import 'package:project_nobody/day_1/tugas_5_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:project_nobody/day_1/tugas_7_flutter.dart';
 
 class Tugas6Flutter extends StatefulWidget {
   const Tugas6Flutter({super.key});
@@ -140,7 +143,7 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
                               actions: [
                                 TextButton(
                                   onPressed: () {
-                                    context.push(Tugas5Flutter());
+                                    context.push(AboutAppScreen());
                                   },
                                   child: const Text("Continue"),
                                 ),
@@ -255,7 +258,7 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        context.push(Tugas4Flutter());
+                        context.push(Tugas7Flutter());
                       },
                       child: const Text(
                         "Log In",

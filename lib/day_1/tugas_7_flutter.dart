@@ -20,6 +20,7 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
       backgroundColor: darkMode ? Colors.grey[900] : Colors.white,
       appBar: AppBar(
         title: const Text('Input Interaktif'),
+        centerTitle: true,
         backgroundColor: darkMode
             ? Colors.black87
             : const Color.fromARGB(255, 22, 1, 100),
