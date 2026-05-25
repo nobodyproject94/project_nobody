@@ -50,7 +50,7 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
             ),
             ListTile(
               leading: const Icon(Icons.category),
-              title: const Text('product category'),
+              title: const Text('List Category'),
               onTap: () => Navigator.pop(context),
             ),
             ListTile(
@@ -64,7 +64,7 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
               onTap: () => Navigator.pop(context),
             ),
             ListTile(
-              leading: const Icon(Icons.apps_outage),
+              leading: const Icon(Icons.info),
               title: const Text('Detail App'),
               onTap: () => Navigator.pop(context),
             ),

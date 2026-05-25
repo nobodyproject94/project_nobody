@@ -69,7 +69,7 @@ class ProfilPage extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.satellite),
+              leading: const Icon(Icons.info),
               title: const Text('Detail App'),
               onTap: () => Navigator.pop(context),
             ),

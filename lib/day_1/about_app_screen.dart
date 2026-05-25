@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:project_nobody/day_1/tugas_7_flutter.dart';
 import 'package:project_nobody/day_1/tugas_8_flutter_2.dart';
+import 'package:project_nobody/day_1/tugas_9_flutter.dart';
 
 class AboutAppScreen extends StatefulWidget {
   const AboutAppScreen({super.key});
@@ -19,6 +20,10 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
           PersistentTabConfig(
             screen: Tugas7Flutter(),
             item: ItemConfig(icon: Icon(Icons.home), title: "Home"),
+          ),
+          PersistentTabConfig(
+            screen: Tugas9Flutter(),
+            item: ItemConfig(icon: Icon(Icons.list), title: "List Category"),
           ),
           PersistentTabConfig(
             screen: Tugas8Flutter2(),
