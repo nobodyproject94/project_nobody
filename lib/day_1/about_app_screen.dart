@@ -22,7 +22,7 @@ class _AboutAppScreenState extends State<AboutAppScreen> {
           ),
           PersistentTabConfig(
             screen: Tugas8Flutter2(),
-            item: ItemConfig(icon: Icon(Icons.apps_sharp), title: "about app"),
+            item: ItemConfig(icon: Icon(Icons.info), title: "about app"),
           ),
         ],
         navBarBuilder: (navBarConfig) =>

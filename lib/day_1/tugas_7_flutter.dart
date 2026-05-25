@@ -63,6 +63,11 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
               title: const Text('set reminder'),
               onTap: () => Navigator.pop(context),
             ),
+            ListTile(
+              leading: const Icon(Icons.apps_outage),
+              title: const Text('Detail App'),
+              onTap: () => Navigator.pop(context),
+            ),
           ],
         ),
       ),
