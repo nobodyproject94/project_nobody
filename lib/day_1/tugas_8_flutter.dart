@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:project_nobody/day_1/tugas_7_flutter.dart';
+import 'package:project_nobody/day_1/about_app_screen.dart';
+import 'package:project_nobody/day_1/tugas_9_flutter.dart';
+import 'package:project_nobody/day_1/tugas_8_flutter_2.dart';
 
 class Tugas8Flutter extends StatefulWidget {
   const Tugas8Flutter({super.key});
@@ -14,7 +16,9 @@ class _Tugas8FlutterState extends State<Tugas8Flutter> {
   int _selectedIndex = 0;
 
   static const List<Widget> _widgetOptions = <Widget>[
-    Tugas7Flutter(),
+    AboutAppScreen(),
+    Tugas9Flutter(),
+    Tugas8Flutter2(),
     Text('MaestroNesia'),
     //Text('Index 2: School'),
   ];
@@ -28,20 +32,47 @@ class _Tugas8FlutterState extends State<Tugas8Flutter> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //appBar: AppBar(title: const Text('BottomNavigationBar Sample')),
+      // Tambahkan ini di dalam Scaffold
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            const DrawerHeader(child: Text('Menu Utama')),
+            ListTile(
+              title: const Text('Home'),
+              onTap: () {
+                _onItemTapped(0); // Pindah ke index 0
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('List Category'), // <--- INI NO 2
+              onTap: () {
+                _onItemTapped(1); // <--- Ubah ke index 1
+                Navigator.pop(context); // Tutup drawer setelah diklik
+              },
+            ),
+            ListTile(
+              title: const Text('Detail App'),
+              onTap: () {
+                _onItemTapped(2); // Pindah ke index 2
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
       body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.business),
-          //   label: 'Business',
-          // ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'profile'),
-        ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
+        onTap: _onItemTapped, // Menggunakan fungsi yang sama!
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.category),
+            label: 'Category',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
       ),
     );
   }

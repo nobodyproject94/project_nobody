@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_nobody/day_1/splashscreen_tugas6_flutter.dart';
+import 'day_1/tugas_8_flutter_2.dart';
+import 'day_1/tugas_9_flutter.dart';
 import 'package:project_nobody/day_1/tugas_8_flutter.dart';
 import 'package:project_nobody/day_1/tugas_4_flutter.dart';
 import 'package:project_nobody/day_1/tugas_5_flutter.dart';
@@ -45,6 +47,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => Splashscreen(),
         '/login': (context) => Tugas6Flutter(),
+        // '/detail': (context) => const ProfilPage(),
+        // '/list-category': (context) => const Tugas9Flutter(),
         //'/home': (context) => Tugas7Flutter(),
       },
       //home: Tugas8flutter(),

@@ -15,17 +15,7 @@ class _Tugas8Flutter2gas5FlutterState extends State<Tugas8Flutter2> {
   int nilaiCounter = 0;
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Profil Toko',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 1, 46, 97),
-        ),
-        useMaterial3: true,
-      ),
-      home: const ProfilPage(),
-    );
+    return const ProfilPage();
   }
 }
 

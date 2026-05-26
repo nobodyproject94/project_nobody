@@ -111,7 +111,7 @@ class _Tugas9FlutterState extends State<Tugas9Flutter> {
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
-          children: const [
+          children: [
             DrawerHeader(
               decoration: BoxDecoration(color: Color.fromARGB(255, 22, 1, 100)),
               child: Text(
@@ -119,8 +119,22 @@ class _Tugas9FlutterState extends State<Tugas9Flutter> {
                 style: TextStyle(color: Colors.white, fontSize: 20),
               ),
             ),
-            ListTile(title: Text('Settings')),
-            ListTile(title: Text('Profile')),
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('Detail App'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/detail');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/home');
+              },
+            ),
           ],
         ),
       ),

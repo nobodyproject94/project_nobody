@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 class Tugas7Flutter extends StatefulWidget {
-  const Tugas7Flutter({super.key});
+  final PersistentTabController? controller;
+  final String? email;
+  final String? password;
+
+  // ADD TO CONSTRUCTOR
+  const Tugas7Flutter({super.key, this.controller, this.email, this.password});
 
   @override
   State<Tugas7Flutter> createState() => _Tugas7FlutterState();
@@ -26,78 +32,138 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
             : const Color.fromARGB(255, 22, 1, 100),
         foregroundColor: Colors.white,
       ),
-      //drawer
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
+            DrawerHeader(
               decoration: BoxDecoration(color: Color.fromARGB(255, 22, 1, 100)),
-              child: Text(
-                'navigation menu',
-                style: TextStyle(color: Colors.white, fontSize: 20),
+              child: Column(
+                children: [
+                  Text(
+                    'navigation menu',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  //text controller_______________________________________
+                  ListTile(
+                    title: Text(
+                      widget.email ?? "",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    subtitle: Text(
+                      widget.password ?? "",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
             ),
             ListTile(
               leading: const Icon(Icons.check_box),
-              title: const Text('terms and condition'),
-              onTap: () => Navigator.pop(context),
+              title: const Text('Terms and Condition'),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Terms and Conditions'),
+                    content: const Text(
+                      'Do you agree to the terms and conditions?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            ischeck = true;
+                          });
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Agree'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            ischeck = false;
+                          });
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Disagree'),
+                      ),
+                    ],
+                  ),
+                );
+                Navigator.pop(context);
+              },
             ),
             ListTile(
               leading: const Icon(Icons.dark_mode),
-              title: const Text('display mode'),
-              onTap: () => Navigator.pop(context),
+              title: const Text('Display Mode'),
+              onTap: () {
+                setState(() {
+                  darkMode = !darkMode;
+                });
+                Navigator.pop(context);
+              },
             ),
             ListTile(
               leading: const Icon(Icons.category),
               title: const Text('List Category'),
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                // Use the controller to jump to tab index 1
+                if (widget.controller != null) {
+                  widget.controller!.jumpToTab(1);
+                }
+                Navigator.pop(context);
+              },
             ),
             ListTile(
               leading: const Icon(Icons.calendar_today),
-              title: const Text('pick day'),
-              onTap: () => Navigator.pop(context),
+              title: const Text('Pick Day'),
+              onTap: () async {
+                Navigator.pop(context);
+                final DateTime? picked = await showDatePicker(
+                  context: context,
+                  initialDate: selectedDate ?? DateTime.now(),
+                  firstDate: DateTime(1800),
+                  lastDate: DateTime(2300),
+                );
+                if (picked != null) {
+                  setState(() => selectedDate = picked);
+                }
+              },
             ),
             ListTile(
               leading: const Icon(Icons.alarm),
-              title: const Text('set reminder'),
-              onTap: () => Navigator.pop(context),
+              title: const Text('Set Reminder'),
+              onTap: () async {
+                Navigator.pop(context);
+                final TimeOfDay? picked = await showTimePicker(
+                  context: context,
+                  initialTime: selectedDay ?? TimeOfDay.now(),
+                );
+                if (picked != null) {
+                  setState(() => selectedDay = picked);
+                }
+              },
             ),
             ListTile(
               leading: const Icon(Icons.info),
               title: const Text('Detail App'),
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                // Use the controller to jump to tab index 2
+                if (widget.controller != null) {
+                  widget.controller!.jumpToTab(2);
+                }
+                Navigator.pop(context);
+              },
             ),
           ],
         ),
       ),
-      //body
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                //CHECKING
-                Checkbox(
-                  value: ischeck,
-                  onChanged: (value) {
-                    setState(() => ischeck = value ?? false);
-                  },
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  ischeck ? "agreed" : "disagreed",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: darkMode
-                        ? Colors.amber
-                        : const Color.fromARGB(255, 2, 1, 100),
-                  ),
-                ),
-              ],
-            ),
             // SWITCHING
             Row(
               children: [
@@ -109,7 +175,7 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  darkMode ? "off" : "on",
+                  darkMode ? "Dark Mode" : "Light Mode",
                   style: TextStyle(
                     fontSize: 16,
                     color: darkMode ? Colors.amber : Colors.black,
@@ -117,7 +183,7 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
                 ),
               ],
             ),
-            //DROP BOTTON
+            // DROPDOWN
             Row(
               children: [
                 DropdownButton<String>(
@@ -140,7 +206,7 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
                 const SizedBox(height: 8),
               ],
             ),
-            //DATE TIME
+            // DATE PICKER
             Row(
               children: [
                 ElevatedButton.icon(
@@ -153,18 +219,17 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
                     );
                     if (picked != null) {
                       setState(() => selectedDate = picked);
-                      {}
                     }
                   },
                   icon: const Icon(Icons.calendar_today),
-                  label: const Text('pick date'),
+                  label: const Text('Pick Date'),
                 ),
               ],
             ),
             const SizedBox(height: 10),
             if (selectedDate != null)
               Text(
-                'Date of Birth: ${selectedDate!.day.toString().padLeft(2, '0')}-'
+                'Selected Date: ${selectedDate!.day.toString().padLeft(2, '0')}-'
                 '${selectedDate!.month.toString().padLeft(2, '0')}-'
                 '${selectedDate!.year}',
                 style: TextStyle(
@@ -173,7 +238,7 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
                 ),
               ),
             const SizedBox(height: 18),
-            // time picker
+            // TIME PICKER
             Row(
               children: [
                 ElevatedButton.icon(
@@ -184,19 +249,17 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
                     );
                     if (picked != null) {
                       setState(() => selectedDay = picked);
-                      {}
                     }
                   },
                   icon: const Icon(Icons.alarm),
-                  label: const Text('set reminder'),
+                  label: const Text('Set Reminder'),
                 ),
               ],
             ),
             const SizedBox(height: 10),
             if (selectedDay != null)
               Text(
-                'A reminder has been set for:'
-                '${selectedDay!.hour.toString().padLeft(2, '0')}:'
+                'Reminder set for: ${selectedDay!.hour.toString().padLeft(2, '0')}:'
                 '${selectedDay!.minute.toString().padLeft(2, '0')}',
                 style: TextStyle(
                   fontSize: 16,
@@ -204,7 +267,7 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
                 ),
               ),
             const SizedBox(height: 25),
-            //RESULT
+            // RESULT SUMMARY
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -221,7 +284,7 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '📋 status summary',
+                    '📋 Status Summary',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -232,35 +295,35 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
                   ),
                   const Divider(),
                   Text(
-                    '• terms & conditions: ${ischeck ? "Registration is allowed ✅" : "Registration is not yet open ❌"}',
+                    '• Terms & Conditions: ${ischeck ? "Agreed ✅" : "Not agreed ❌"}',
                     style: TextStyle(
                       color: darkMode ? Colors.white : Colors.amber,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '• display mode: ${darkMode ? "dark 🌙" : "light ☀️"}',
+                    '• Display Mode: ${darkMode ? "Dark 🌙" : "Light ☀️"}',
                     style: TextStyle(
                       color: darkMode ? Colors.white : Colors.amber,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '• category: ${selectedDropDwon ?? "Not yet selected"}',
+                    '• Category: ${selectedDropDwon ?? "Not selected"}',
                     style: TextStyle(
                       color: darkMode ? Colors.white : Colors.amber,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '• date of birth: ${selectedDate != null ? "${selectedDate!.day.toString().padLeft(2, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.year}" : "Belum dipilih"}',
+                    '• Selected Date: ${selectedDate != null ? "${selectedDate!.day.toString().padLeft(2, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.year}" : "Not selected"}',
                     style: TextStyle(
                       color: darkMode ? Colors.white : Colors.amber,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '• reminder: ${selectedDay != null ? "${selectedDay!.hour.toString().padLeft(2, '0')}:${selectedDay!.minute.toString().padLeft(2, '0')}" : "Belum diatur"}',
+                    '• Reminder: ${selectedDay != null ? "${selectedDay!.hour.toString().padLeft(2, '0')}:${selectedDay!.minute.toString().padLeft(2, '0')}" : "Not set"}',
                     style: TextStyle(
                       color: darkMode ? Colors.white : Colors.amber,
                     ),

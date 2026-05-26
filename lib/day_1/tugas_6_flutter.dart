@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_nobody/day_1/about_app_screen.dart';
 import 'package:project_nobody/day_1/extension/extension_navigator.dart';
-import 'package:project_nobody/day_1/tugas_8_flutter.dart';
-import 'package:project_nobody/day_1/tugas_4_flutter.dart';
-import 'package:project_nobody/day_1/tugas_5_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:project_nobody/day_1/tugas_7_flutter.dart';
 
@@ -17,6 +14,8 @@ class Tugas6Flutter extends StatefulWidget {
 class _Tugas6FlutterState extends State<Tugas6Flutter> {
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +57,11 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
               children: [
                 // ── EMAIL ──────────────────────────
                 TextFormField(
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  controller: emailController,
+                  // decoration:InputDecoration(labelText: 'email'),
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: 'enter your email',
@@ -83,6 +87,7 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
                 // ── PASSWORD ───────────────────────
                 TextFormField(
                   obscureText: _obscurePassword,
+                  controller: passwordController,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: 'enter your password',
@@ -143,7 +148,12 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
                               actions: [
                                 TextButton(
                                   onPressed: () {
-                                    context.push(AboutAppScreen());
+                                    context.push(
+                                      AboutAppScreen(
+                                        email: emailController.text,
+                                        password: passwordController.text,
+                                      ),
+                                    );
                                   },
                                   child: const Text("Continue"),
                                 ),
@@ -152,6 +162,7 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
                           },
                         );
                       } else {
+                        print(emailController);
                         Fluttertoast.showToast(
                           msg: "Please check your input again",
                           toastLength: Toast.LENGTH_SHORT,
