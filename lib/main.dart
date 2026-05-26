@@ -6,7 +6,7 @@ import 'package:project_nobody/day_1/tugas_8_flutter.dart';
 import 'package:project_nobody/day_1/tugas_4_flutter.dart';
 import 'package:project_nobody/day_1/tugas_5_flutter.dart';
 import 'package:project_nobody/day_1/tugas_6_flutter.dart';
-import 'package:project_nobody/day_1/tugas_7_flutter.dart';
+import 'package:project_nobody/day_1/tugas_7&10_flutter.dart';
 import 'package:project_nobody/day_1/tugas_flutter_3.dart';
 import 'package:project_nobody/day_1/tugas2flutter.dart';
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_nobody/day_1/about_app_screen.dart';
 import 'package:project_nobody/day_1/extension/extension_navigator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:project_nobody/day_1/tugas_7_flutter.dart';
+import 'package:project_nobody/day_1/tugas_7&10_flutter.dart';
 
 class Tugas6Flutter extends StatefulWidget {
   const Tugas6Flutter({super.key});
