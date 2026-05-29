@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+import 'package:project_nobody/day_1/database/preference_handler.dart';
+import 'package:project_nobody/day_1/extension/extension_navigator.dart';
+import 'package:project_nobody/day_1/tugas_6_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Tugas7Flutter extends StatefulWidget {
   final PersistentTabController? controller;
@@ -20,6 +24,20 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
   DateTime? selectedDate;
   TimeOfDay? selectedDay;
 
+  void _prossesLogout() async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Logged out'),
+        backgroundColor: Colors.amber,
+        duration: Duration(seconds: 3),
+      ),
+    );
+
+    await PreferenceHandler.logOut();
+    if (!mounted) return;
+    context.pushAndRemoveAll(Tugas6Flutter());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,6 +49,22 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
             ? Colors.black87
             : const Color.fromARGB(255, 22, 1, 100),
         foregroundColor: Colors.white,
+        // actions: [
+        //   // <-- tambahkan ini
+        //   IconButton(
+        //     icon: const Icon(Icons.logout),
+        //     onPressed: () async {
+        //       await PreferenceHandler.setLogin(false);
+        //       if (!context.mounted) return;
+        //       Navigator.pushReplacement(
+        //         context,
+        //         MaterialPageRoute(
+        //           builder: (_) => const Tugas6Flutter(showLogoutSnackbar: true),
+        //         ),
+        //       );
+        //     },
+        //   ),
+        // ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -155,6 +189,11 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
                 }
                 Navigator.pop(context);
               },
+            ),
+            ListTile(
+              leading: const Icon(Icons.arrow_back),
+              title: const Text('Logout'),
+              onTap: _prossesLogout,
             ),
           ],
         ),

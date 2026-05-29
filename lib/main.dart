@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:project_nobody/day_1/splashscreen_tugas6_flutter.dart';
+import 'package:project_nobody/day_1/database/preference_handler.dart';
+import 'package:project_nobody/day_1/view/splashscreen_tugas6_flutter.dart';
 import 'day_1/tugas_8_flutter_2.dart';
 import 'day_1/tugas_9_flutter.dart';
 import 'package:project_nobody/day_1/tugas_8_flutter.dart';
-import 'package:project_nobody/day_1/tugas_4_flutter.dart';
-import 'package:project_nobody/day_1/tugas_5_flutter.dart';
 import 'package:project_nobody/day_1/tugas_6_flutter.dart';
-import 'package:project_nobody/day_1/tugas_7&10_flutter.dart';
-import 'package:project_nobody/day_1/tugas_flutter_3.dart';
-import 'package:project_nobody/day_1/tugas2flutter.dart';
+import 'package:project_nobody/day_1/tugas_7dan10_flutter.dart';
 
-void main() {
+import 'package:intl/date_symbol_data_local.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null);
+  await PreferenceHandler.init();
   runApp(const MyApp());
 }
 

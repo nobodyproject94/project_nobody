@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
-import 'package:project_nobody/day_1/tugas_7&10_flutter.dart';
+import 'package:project_nobody/day_1/tugas_7dan10_flutter.dart';
 import 'package:project_nobody/day_1/tugas_8_flutter_2.dart';
 import 'package:project_nobody/day_1/tugas_9_flutter.dart';
 

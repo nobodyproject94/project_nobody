@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:project_nobody/day_1/about_app_screen.dart';
+import 'package:project_nobody/day_1/database/preference_handler.dart';
 import 'package:project_nobody/day_1/extension/extension_navigator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:project_nobody/day_1/tugas_7&10_flutter.dart';
+import 'package:project_nobody/day_1/tugas_7dan10_flutter.dart';
 
 class Tugas6Flutter extends StatefulWidget {
-  const Tugas6Flutter({super.key});
+  final bool showLogoutSnackbar;
+  const Tugas6Flutter({super.key, this.showLogoutSnackbar = false});
 
   @override
   State<Tugas6Flutter> createState() => _Tugas6FlutterState();
@@ -16,6 +18,22 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
   bool _obscurePassword = true;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.showLogoutSnackbar) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Logged out'),
+            backgroundColor: Colors.redAccent,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +155,9 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
+                      await PreferenceHandler.setLogin(true);
+                      if (!mounted) return;
                       if (_formKey.currentState!.validate()) {
                         showDialog(
                           context: context,
