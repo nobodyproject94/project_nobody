@@ -26,16 +26,23 @@ class _Tugas7FlutterState extends State<Tugas7Flutter> {
 
   void _prossesLogout() async {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Logged out'),
-        backgroundColor: Colors.amber,
-        duration: Duration(seconds: 3),
+        backgroundColor: Colors.redAccent,
+        duration: Duration(seconds: 2),
       ),
     );
 
     await PreferenceHandler.logOut();
     if (!mounted) return;
-    context.pushAndRemoveAll(Tugas6Flutter());
+
+    // Ganti menggunakan rootNavigator agar jebol keluar dari Bottom Navigation 👇
+    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => const Tugas6Flutter(showLogoutSnackbar: true),
+      ),
+      (route) => false, // Menghapus semua tumpukan halaman lama
+    );
   }
 
   @override

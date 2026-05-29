@@ -19,21 +19,21 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    if (widget.showLogoutSnackbar) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Logged out'),
-            backgroundColor: Colors.redAccent,
-            duration: Duration(seconds: 2),
-          ),
-        );
-      });
-    }
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   if (widget.showLogoutSnackbar) {
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //           content: Text('Logged out'),
+  //           backgroundColor: Colors.redAccent,
+  //           duration: Duration(seconds: 2),
+  //         ),
+  //       );
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
