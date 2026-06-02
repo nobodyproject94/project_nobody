@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:project_nobody/day_1/database/preference_handler.dart';
-import 'package:project_nobody/day_1/extension/extension_navigator.dart';
+// import 'package:project_nobody/day_1/extension/extension_navigator.dart';
 import 'package:project_nobody/day_1/tugas_6_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class Tugas7Flutter extends StatefulWidget {
   final PersistentTabController? controller;

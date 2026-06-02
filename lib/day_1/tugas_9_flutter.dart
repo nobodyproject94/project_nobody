@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:project_nobody/day_1/expert_models/experts_models.dart';
+import 'package:project_nobody/day_1/models/experts_models.dart';
 
 class Tugas9Flutter extends StatefulWidget {
   const Tugas9Flutter({super.key});

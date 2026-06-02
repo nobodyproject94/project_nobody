@@ -3,6 +3,7 @@ import 'package:project_nobody/day_1/about_app_screen.dart';
 import 'package:project_nobody/day_1/database/preference_handler.dart';
 import 'package:project_nobody/day_1/extension/extension_navigator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:project_nobody/day_1/tugas11flutter.dart';
 import 'package:project_nobody/day_1/tugas_7dan10_flutter.dart';
 
 class Tugas6Flutter extends StatefulWidget {
@@ -169,9 +170,9 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
                                 TextButton(
                                   onPressed: () {
                                     context.push(
-                                      AboutAppScreen(
-                                        email: emailController.text,
-                                        password: passwordController.text,
+                                      Tugas11Flutter(
+                                        // email: emailController.text,
+                                        // password: passwordController.text,
                                       ),
                                     );
                                   },
@@ -289,7 +290,7 @@ class _Tugas6FlutterState extends State<Tugas6Flutter> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        context.push(Tugas7Flutter());
+                        context.push(AboutAppScreen());
                       },
                       child: const Text(
                         "Log In",

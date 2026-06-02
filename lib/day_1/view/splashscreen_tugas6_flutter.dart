@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:project_nobody/day_1/database/preference_handler.dart';
 import 'package:project_nobody/day_1/extension/extension_navigator.dart';
 import 'package:project_nobody/day_1/tugas_6_flutter.dart';
-import 'package:project_nobody/day_1/tugas_7dan10_flutter.dart'; // home screen
+import 'package:project_nobody/day_1/tugas_7dan10_flutter.dart';
+// import 'package:project_nobody/day_1/tugas11flutter.dart';
+// home screen
 
 class Splashscreen extends StatefulWidget {
   const Splashscreen({super.key});

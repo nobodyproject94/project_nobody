@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:project_nobody/day_1/database/preference_handler.dart';
 import 'package:project_nobody/day_1/view/splashscreen_tugas6_flutter.dart';
-import 'day_1/tugas_8_flutter_2.dart';
-import 'day_1/tugas_9_flutter.dart';
-import 'package:project_nobody/day_1/tugas_8_flutter.dart';
+// import 'day_1/tugas_8_flutter_2.dart';
+// import 'day_1/tugas_9_flutter.dart';
+// import 'package:project_nobody/day_1/tugas_8_flutter.dart';
 import 'package:project_nobody/day_1/tugas_6_flutter.dart';
-import 'package:project_nobody/day_1/tugas_7dan10_flutter.dart';
+// import 'package:project_nobody/day_1/tugas_7dan10_flutter.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
 
