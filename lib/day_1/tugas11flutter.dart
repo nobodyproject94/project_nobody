@@ -225,7 +225,9 @@ class _Tugas11FlutterState extends State<Tugas11Flutter> {
                     return Center(
                       child: Text(
                         'Error: ${snapshot.error}',
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(
+                          color: Color.fromARGB(255, 247, 213, 213),
+                        ),
                       ),
                     );
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
