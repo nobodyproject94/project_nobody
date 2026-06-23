@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_nobody/day_1/database/preference_handler.dart';
+import 'package:project_nobody/day_1/view/ghibli_screen.dart';
 import 'package:project_nobody/day_1/view/splashscreen_tugas6_flutter.dart';
 // import 'day_1/tugas_8_flutter_2.dart';
 // import 'day_1/tugas_9_flutter.dart';
@@ -47,7 +48,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => Splashscreen(),
+        '/': (context) => GhibliScreen(),
         '/login': (context) => Tugas6Flutter(),
         // '/detail': (context) => const ProfilPage(),
         // '/list-category': (context) => const Tugas9Flutter(),
