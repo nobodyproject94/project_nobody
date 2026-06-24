@@ -4,7 +4,6 @@ import 'package:project_nobody/day_1/database/preference_handler.dart';
 import 'package:project_nobody/day_1/extension/extension_navigator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:project_nobody/day_1/tugas11flutter.dart';
-import 'package:project_nobody/day_1/tugas_7dan10_flutter.dart';
 
 class Tugas6Flutter extends StatefulWidget {
   final bool showLogoutSnackbar;
