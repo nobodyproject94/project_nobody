@@ -36,13 +36,14 @@ class _SplashscreenState extends State<Splashscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue,
       body: Stack(
         children: [
           SizedBox(
             width: double.infinity,
             height: double.infinity,
             child: Image.asset(
-              'assets/images/Ghibli Studio.png',
+              'assets/images/ghibli logo.png',
               fit: BoxFit.fill,
             ),
           ),
