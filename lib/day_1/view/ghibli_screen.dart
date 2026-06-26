@@ -161,7 +161,7 @@ class __GhibliScreenState extends State<GhibliScreen> {
                                 post.image,
                                 width: 55,
                                 height: 80,
-                                fit: BoxFit.cover,
+                                fit: BoxFit.fill,
                                 errorBuilder: (context, error, stackTrace) {
                                   return const Icon(
                                     Icons.broken_image,

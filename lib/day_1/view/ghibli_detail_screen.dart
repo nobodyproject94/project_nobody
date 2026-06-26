@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_nobody/day_1/models/ghibli.dart';
+import 'dart:ui'; // 👈 Tambahkan ini di deretan atas
 
 class GhibliDetailScreen extends StatefulWidget {
   final Ghibli post;
@@ -27,10 +28,7 @@ class _GhibliDetailScreenState extends State<GhibliDetailScreen> {
           SizedBox(
             width: double.infinity,
             height: double.infinity,
-            child: Image.asset(
-              'assets/images/Ghibli Studio.png',
-              fit: BoxFit.fill,
-            ),
+            child: Image.network(widget.post.image, fit: BoxFit.fill),
           ),
           SafeArea(
             child: SingleChildScrollView(
@@ -43,7 +41,7 @@ class _GhibliDetailScreenState extends State<GhibliDetailScreen> {
                       widget.post.image,
                       width: 200,
                       height: 200,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fill,
                     ),
                   ),
                   const SizedBox(height: 8),
