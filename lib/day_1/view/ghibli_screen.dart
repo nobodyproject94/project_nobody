@@ -110,11 +110,12 @@ class __GhibliScreenState extends State<GhibliScreen> {
                       child: ChoiceChip(
                         label: Text(category),
                         selected: isSelected,
+                        showCheckmark: false,
                         selectedColor: Colors.blueAccent,
                         backgroundColor: Colors.black.withValues(alpha: 0.5),
                         labelStyle: TextStyle(
                           color: isSelected ? Colors.white : Colors.white,
-                          
+
                           fontWeight: isSelected
                               ? FontWeight.bold
                               : FontWeight.normal,
@@ -200,8 +201,8 @@ class __GhibliScreenState extends State<GhibliScreen> {
                     if (filteredPosts.isEmpty) {
                       return const Center(
                         child: Text(
-                          'Film tidak ditemukan.',
-                          style: TextStyle(color: Colors.white),
+                          'Film not found',
+                          style: TextStyle(color: Colors.blueGrey),
                         ),
                       );
                     }
