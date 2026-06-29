@@ -114,6 +114,7 @@ class __GhibliScreenState extends State<GhibliScreen> {
                         backgroundColor: Colors.black.withValues(alpha: 0.5),
                         labelStyle: TextStyle(
                           color: isSelected ? Colors.white : Colors.white,
+                          
                           fontWeight: isSelected
                               ? FontWeight.bold
                               : FontWeight.normal,
