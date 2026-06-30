@@ -1,6 +1,6 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:project_nobody/day_1/models/user_model_sql.dart'; // Sesuaikan path ini jika merah
+import 'package:project_nobody/day_1/models/user_sql_model.dart'; // Sesuaikan path ini jika merah
 
 class DBHelper {
   static final DBHelper _instance = DBHelper._internal();

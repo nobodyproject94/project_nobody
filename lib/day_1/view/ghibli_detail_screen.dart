@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_nobody/day_1/models/ghibli.dart';
-import 'dart:ui'; // 👈 Tambahkan ini di deretan atas
+// 👈 Tambahkan ini di deretan atas
 
 class GhibliDetailScreen extends StatefulWidget {
   final Ghibli post;

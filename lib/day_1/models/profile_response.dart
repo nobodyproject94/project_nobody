@@ -1,9 +1,9 @@
 import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:project_nobody/day_1/models/user_model.dart';
-import 'package:project_nobody/day_1/models/auth_resnponse.dart';
 
-
+part 'profile_response.g.dart';
 
 ProfileResponse profileResponseFromJson(String str) =>
     ProfileResponse.fromJson(json.decode(str));
@@ -21,7 +21,7 @@ class ProfileResponse {
   ProfileResponse({this.message, this.data});
 
   factory ProfileResponse.fromJson(Map<String, dynamic> json) =>
-      _$profileResponseFromJson(json);
+      _$ProfileResponseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$profileResponseToJson(this);
+  Map<String, dynamic> toJson() => _$ProfileResponseToJson(this);
 }

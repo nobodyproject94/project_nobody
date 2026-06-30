@@ -1,96 +1,89 @@
-import 'dart:convert';
+// To parse this JSON data, do
+//
+//     final register = registerFromJson(jsonString);
+
 import 'package:json_annotation/json_annotation.dart';
+import 'dart:convert';
 
-AuthResponse authResponseFromJson(String str) =>
-    AuthResponse.fromJson(json.decode(str));
+part 'register.g.dart';
 
-String authResponseToJson(AuthResponse data) => json.encode(data.toJson());
+Register registerFromJson(String str) => Register.fromJson(json.decode(str));
+
+String registerToJson(Register data) => json.encode(data.toJson());
 
 @JsonSerializable()
-class AuthResponse {
+class Register {
   @JsonKey(name: "message")
   String? message;
   @JsonKey(name: "data")
-  AuthData? data;
+  Data? data;
 
-  AuthResponse({this.message, this.data});
+  Register({this.message, this.data});
 
-  factory AuthResponse.fromJson(Map<String, dynamic> json) =>
-      _$authResponseFromJson(json);
+  factory Register.fromJson(Map<String, dynamic> json) =>
+      _$RegisterFromJson(json);
 
-  Map<String, dynamic> toJson() => _$authResponseToJson(this);
+  Map<String, dynamic> toJson() => _$RegisterToJson(this);
 }
 
 @JsonSerializable()
-class AuthData {
+class Data {
   @JsonKey(name: "token")
   String? token;
   @JsonKey(name: "user")
-  UserModel? user;
+  User? user;
+  @JsonKey(name: "profile_photo_url")
+  String? profilePhotoUrl;
 
-  AuthData({this.token, this.user});
+  Data({this.token, this.user, this.profilePhotoUrl});
 
-  factory AuthData.fromJson(Map<String, dynamic> json) =>
-      _$AuthDataFromJson(json);
+  factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
 
-  Map<String, dynamic> toJson() => _$AuthDataToJson(this);
+  Map<String, dynamic> toJson() => _$DataToJson(this);
 }
 
 @JsonSerializable()
-class UserModel {
-  @JsonKey(name: "id")
-  int? id;
+class User {
   @JsonKey(name: "name")
   String? name;
   @JsonKey(name: "email")
   String? email;
-  @JsonKey(name: "role")
-  String? role;
-  @JsonKey(name: "email_verified_at")
-  dynamic emailVerifiedAt;
-  @JsonKey(name: "is_active")
-  String? isActive;
-  @JsonKey(name: "created_at")
-  DateTime? createdAt;
-  @JsonKey(name: "updated_at")
-  DateTime? updatedAt;
   @JsonKey(name: "batch_id")
-  String? batchId;
+  int? batchId;
   @JsonKey(name: "training_id")
-  String? trainingId;
+  int? trainingId;
   @JsonKey(name: "jenis_kelamin")
-  dynamic jenisKelamin;
+  String? jenisKelamin;
   @JsonKey(name: "profile_photo")
   String? profilePhoto;
-  @JsonKey(name: "onesignal_player_id")
-  String? onesignalPlayerId;
+  @JsonKey(name: "updated_at")
+  DateTime? updatedAt;
+  @JsonKey(name: "created_at")
+  DateTime? createdAt;
+  @JsonKey(name: "id")
+  int? id;
   @JsonKey(name: "batch")
   Batch? batch;
   @JsonKey(name: "training")
   Training? training;
 
-  UserModel({
-    this.id,
+  User({
     this.name,
     this.email,
-    this.role,
-    this.emailVerifiedAt,
-    this.isActive,
-    this.createdAt,
-    this.updatedAt,
     this.batchId,
     this.trainingId,
     this.jenisKelamin,
     this.profilePhoto,
-    this.onesignalPlayerId,
+    this.updatedAt,
+    this.createdAt,
+    this.id,
     this.batch,
     this.training,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
-  Map<String, dynamic> toJson() => _$UserModelToJson(this);
+  Map<String, dynamic> toJson() => _$UserToJson(this);
 }
 
 @JsonSerializable()

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:project_nobody/day_1/database/db_helper.dart';
-import 'package:project_nobody/day_1/models/user_model_sql.dart';
+import 'package:project_nobody/day_1/models/user_sql_model.dart';
 import 'package:flutter/services.dart';
 // import 'package:project_nobody/day_1/tugas11flutter.dart';
 // import 'user_model_sql.dart';
