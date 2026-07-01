@@ -8,6 +8,7 @@ import 'package:project_nobody/day_1/view/ghibli_screen.dart';
 // import 'package:project_nobody/day_1/tugas_7dan10_flutter.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:project_nobody/day_1/view/splashscreen_tugas6_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +48,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const LoginPage(),
+        '/': (context) =>Splashscreen(),
         '/login': (context) => GhibliScreen(),
         // '/detail': (context) => const ProfilPage(),
         // '/list-category': (context) => const Tugas9Flutter(),

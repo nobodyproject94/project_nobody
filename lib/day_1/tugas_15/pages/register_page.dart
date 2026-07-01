@@ -1,15 +1,19 @@
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import '../../services/api_service.dart';
-import '../../services/dio_client.dart';
-import 'login_page.dart';
+import 'package:flutter/material.dart';
 
+import '../models/training_model.dart';
+import '../services/api_service.dart';
+import '../services/dio_client.dart';
+import '../services/token_services.dart';
+import '../utils/absensi_ui.dart';
+import 'dashboard_page.dart';
+import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
@@ -18,167 +22,200 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _batchIdController = TextEditingController(text: '1');
-  final _trainingIdController = TextEditingController(text: '1');
+
   String _jenisKelamin = 'L';
   bool _isLoading = false;
+  bool _loadingTrainings = true;
+  bool _obscurePassword = true;
+  List<TrainingModel> _trainings = [];
+  int? _selectedTrainingId;
 
-  void _register() async {
+  @override
+  void initState() {
+    super.initState();
+    _fetchTrainings();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _batchIdController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchTrainings() async {
+    try {
+      final response = await ApiService(createDioClient()).getTrainings();
+      final list = response.data ?? [];
+      if (!mounted) return;
+      setState(() {
+        _trainings = list;
+        _selectedTrainingId = list.isNotEmpty ? list.first.id : null;
+        _loadingTrainings = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loadingTrainings = false);
+    }
+  }
+
+  Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
     try {
-      final dio = createDioClient();
-      final apiService = ApiService(dio);
-
+      final apiService = ApiService(createDioClient());
       final body = {
-        "name": _nameController.text,
-        "email": _emailController.text,
-        "password": _passwordController.text,
-        "jenis_kelamin": _jenisKelamin,
-        "batch_id": int.tryParse(_batchIdController.text) ?? 1,
-        "training_id": int.tryParse(_trainingIdController.text) ?? 1,
-        "profile_photo":
-            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+        'name': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'password': _passwordController.text,
+        'jenis_kelamin': _jenisKelamin,
+        'batch_id': int.tryParse(_batchIdController.text.trim()) ?? 1,
+        'training_id': _selectedTrainingId ?? 1,
+        'profile_photo': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
       };
 
-      await apiService.register(body);
+      final dynamic response = await apiService.register(body);
+      final token = response?.data?.token?.toString();
 
       if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Registrasi Berhasil! Silakan Login.")),
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginPage()),
-      );
-    } on DioException catch (e) {
-      String errorMessage = "Gagal mendaftar: Terjadi kesalahan jaringan.";
-      if (e.response != null) {
-        if (e.response!.statusCode == 500) {
-          errorMessage = "Gagal mendaftar: Terjadi kesalahan pada server (500). Coba lagi nanti.";
-        } else {
-          errorMessage = "Gagal mendaftar: ${e.response?.data['message'] ?? e.message}";
-        }
+      if (token != null && token.isNotEmpty) {
+        await TokenStorage.saveToken(token);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const DashboardPage()),
+          (_) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Registrasi berhasil. Silakan login.')));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginPage()));
       }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage)));
+    } on DioException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_dioErrorMessage(e))));
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Gagal mendaftar: $e")));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mendaftar: $e')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  String _dioErrorMessage(DioException e) {
+    if (e.response == null) return 'Gagal mendaftar: Terjadi kesalahan jaringan.';
+    final status = e.response!.statusCode;
+    if (status == 422) return 'Gagal mendaftar: ${extractApiMessage(e.response?.data, 'Data registrasi tidak valid.')}';
+    if (status == 500) return 'Gagal mendaftar: server sedang bermasalah (500).';
+    return 'Gagal mendaftar: ${extractApiMessage(e.response?.data, e.message ?? 'Terjadi kesalahan.')}';
+  }
+
+  String? _required(String? value, String label) {
+    if ((value ?? '').trim().isEmpty) return '$label tidak boleh kosong';
+    return null;
+  }
+
+  String? _emailValidator(String? value) {
+    final text = value?.trim() ?? '';
+    if (text.isEmpty) return 'Email tidak boleh kosong';
+    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(text)) return 'Format email tidak valid';
+    return null;
+  }
+
+  String? _passwordValidator(String? value) {
+    final text = value ?? '';
+    if (text.isEmpty) return 'Password tidak boleh kosong';
+    if (text.length < 6) return 'Password minimal 6 karakter';
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Register")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Icon(Icons.person_add, size: 64, color: Colors.blueGrey),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        labelText: "Name",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: const Icon(Icons.person),
+      appBar: AppBar(title: const Text('Register')),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Buat Akun Baru', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 8),
+              const Text('Lengkapi data peserta untuk aktivasi akun absensi PPKD.'),
+              const SizedBox(height: 22),
+              AbsensiCard(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: absensiInputDecoration('Nama', Icons.person_rounded),
+                        validator: (v) => _required(v, 'Nama'),
                       ),
-                      validator: (val) => val!.isEmpty ? "Nama tidak boleh kosong" : null,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: "Email",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: const Icon(Icons.email),
+                      const SizedBox(height: 14),
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: absensiInputDecoration('Email', Icons.email_rounded),
+                        validator: _emailValidator,
                       ),
-                      validator: (val) => val!.isEmpty ? "Email tidak boleh kosong" : null,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: const Icon(Icons.lock),
+                      const SizedBox(height: 14),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword,
+                        decoration: absensiInputDecoration('Password', Icons.lock_rounded).copyWith(
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscurePassword ? Icons.visibility_rounded : Icons.visibility_off_rounded),
+                            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                          ),
+                        ),
+                        validator: _passwordValidator,
                       ),
-                      validator: (val) => val!.isEmpty ? "Password tidak boleh kosong" : null,
-                    ),
-                    const SizedBox(height: 16),
-                    DropdownButtonFormField<String>(
-                      initialValue: _jenisKelamin,
-                      decoration: InputDecoration(
-                        labelText: "Jenis Kelamin",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: const Icon(Icons.transgender),
+                      const SizedBox(height: 14),
+                      DropdownButtonFormField<String>(
+                        value: _jenisKelamin,
+                        isExpanded: true,
+                        decoration: absensiInputDecoration('Jenis Kelamin', Icons.transgender_rounded),
+                        items: const [
+                          DropdownMenuItem(value: 'L', child: Text('Laki-laki')),
+                          DropdownMenuItem(value: 'P', child: Text('Perempuan')),
+                        ],
+                        onChanged: (value) => setState(() => _jenisKelamin = value ?? 'L'),
                       ),
-                      items: const [
-                        DropdownMenuItem(value: 'L', child: Text('Laki-laki')),
-                        DropdownMenuItem(value: 'P', child: Text('Perempuan')),
-                      ],
-                      onChanged: (val) => setState(() => _jenisKelamin = val!),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _batchIdController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: "Batch ID",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: const Icon(Icons.badge),
+                      const SizedBox(height: 14),
+                      TextFormField(
+                        controller: _batchIdController,
+                        keyboardType: TextInputType.number,
+                        decoration: absensiInputDecoration('Batch ID', Icons.badge_rounded),
+                        validator: (v) => _required(v, 'Batch ID'),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _trainingIdController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: "Training ID",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: const Icon(Icons.school),
+                      const SizedBox(height: 14),
+                      _loadingTrainings
+                          ? const Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator())
+                          : DropdownButtonFormField<int>(
+                              value: _selectedTrainingId,
+                              isExpanded: true,
+                              decoration: absensiInputDecoration('Training', Icons.school_rounded),
+                              items: _trainings
+                                  .map((t) => DropdownMenuItem<int>(value: t.id, child: Text(t.title ?? 'Training ${t.id}')))
+                                  .toList(),
+                              validator: (v) => v == null ? 'Training harus dipilih' : null,
+                              onChanged: (value) => setState(() => _selectedTrainingId = value),
+                            ),
+                      const SizedBox(height: 24),
+                      PrimaryButton(label: 'Register', icon: Icons.person_add_alt_1_rounded, loading: _isLoading, onPressed: _register),
+                      const SizedBox(height: 10),
+                      TextButton(
+                        onPressed: _isLoading ? null : () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginPage())),
+                        child: const Text('Sudah punya akun? Login di sini'),
                       ),
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _register,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text("Register", style: TextStyle(fontSize: 16)),
-                    ),
-                    const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => const LoginPage()),
-                        );
-                      },
-                      child: const Text("Sudah punya akun? Login di sini"),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),

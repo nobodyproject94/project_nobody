@@ -3,9 +3,10 @@ import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
-import '../../models/user_model.dart';
-import '../../services/api_service.dart';
-import '../../services/dio_client.dart';
+import '../models/user_model.dart';
+import '../services/api_service.dart';
+import '../services/dio_client.dart';
+import '../models/training_model.dart';
 
 class EditProfilePage extends StatefulWidget {
   final UserModel user;
@@ -13,7 +14,7 @@ class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key, required this.user});
 
   @override
-  _EditProfilePageState createState() => _EditProfilePageState();
+  State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
@@ -22,11 +23,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
   late TextEditingController _batchIdController;
-  late TextEditingController _trainingIdController;
   late String _jenisKelamin;
+
   bool _isLoading = false;
   String? _base64Image;
   File? _imageFile;
+
+  List<TrainingModel>? _trainings;
+  bool _isLoadingTrainings = true;
+  int? _selectedTrainingId;
+
+  // Theme colors disamakan dengan screen Profile Dashboard pada screenshot
+  static const Color _pageBg = Color(0xFFFFF7FF);
+  static const Color _cardBg = Color(0xFFFDF6FF);
+  static const Color _primaryPurple = Color(0xFF76558F);
+  static const Color _iconBlueGrey = Color(0xFF6D8791);
+  static const Color _labelGrey = Color(0xFFB5ADB8);
+  static const Color _dividerColor = Color(0xFFD8CCD9);
+  static const Color _textDark = Color(0xFF2B2530);
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -35,8 +49,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final bytes = await File(pickedFile.path).readAsBytes();
       setState(() {
         _imageFile = File(pickedFile.path);
-        _base64Image = "data:image/png;base64,${base64Encode(bytes)}";
+        _base64Image = 'data:image/png;base64,${base64Encode(bytes)}';
       });
+    }
+  }
+
+  Future<void> _fetchTrainings() async {
+    try {
+      final dio = createDioClient();
+      final apiService = ApiService(dio);
+      final response = await apiService.getTrainings();
+      if (!mounted) return;
+      setState(() {
+        _trainings = response.data;
+        _isLoadingTrainings = false;
+
+        if (_trainings != null && _selectedTrainingId != null) {
+          final exists = _trainings!.any((t) => t.id == _selectedTrainingId);
+          if (!exists) _selectedTrainingId = null;
+        }
+      });
+    } catch (e) {
+      debugPrint('Gagal mengambil data training: $e');
+      if (!mounted) return;
+      setState(() => _isLoadingTrainings = false);
     }
   }
 
@@ -47,15 +83,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _emailController = TextEditingController(text: widget.user.email ?? '');
     _passwordController = TextEditingController();
     _batchIdController = TextEditingController(
-      text: widget.user.batchId?.toString() ?? '1',
+      text: widget.user.batchId?.toString() ?? '',
     );
-    _trainingIdController = TextEditingController(
-      text: widget.user.trainingId?.toString() ?? '1',
-    );
+    _selectedTrainingId = widget.user.trainingId;
     _jenisKelamin =
         (widget.user.jenisKelamin == 'L' || widget.user.jenisKelamin == 'P')
         ? widget.user.jenisKelamin!
         : 'L';
+    _fetchTrainings();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _batchIdController.dispose();
+    super.dispose();
   }
 
   void _updateProfile() async {
@@ -66,26 +110,42 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final dio = createDioClient();
       final apiService = ApiService(dio);
 
-      // ── 1. Update nama ────────────────────────────────────────────────────
-      // PUT /api/profile hanya menerima field "name".
-      // Field lain (email, jenis_kelamin, dll) TIDAK didukung → 422.
       final body = <String, dynamic>{
         'name': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'jenis_kelamin': _jenisKelamin,
       };
+
+      if (_batchIdController.text.trim().isNotEmpty) {
+        body['batch_id'] = int.tryParse(_batchIdController.text.trim());
+      }
+
+      if (_selectedTrainingId != null) {
+        body['training_id'] = _selectedTrainingId;
+      }
+
+      if (_passwordController.text.trim().isNotEmpty) {
+        body['password'] = _passwordController.text.trim();
+      }
 
       debugPrint('--> Update profile body: $body');
       final response = await apiService.updateProfile(body);
-      debugPrint('<-- Update profile response: ${response.message} | '
-          'user=${response.data?.name ?? response.user?.name}');
+      debugPrint(
+        '<-- Update profile response: ${response.message} | '
+        'user=${response.data?.name ?? response.user?.name}',
+      );
 
-      // ── 2. Update foto (jika ada gambar baru dipilih) ────────────────────
+      String? newProfilePhoto = widget.user.profilePhoto;
+
       if (_base64Image != null) {
-        final photoBody = <String, dynamic>{
-          'profile_photo': _base64Image!,
-        };
-        debugPrint('--> Update photo body: { profile_photo: [base64 data...] }');
+        final photoBody = <String, dynamic>{'profile_photo': _base64Image!};
         final photoResponse = await apiService.updateProfilePhoto(photoBody);
         debugPrint('<-- Update photo response: ${photoResponse.message}');
+
+        final returnedPhoto =
+            photoResponse.data?.profilePhoto ??
+            photoResponse.user?.profilePhoto;
+        if (returnedPhoto != null) newProfilePhoto = returnedPhoto;
       }
 
       if (!mounted) return;
@@ -93,202 +153,374 @@ class _EditProfilePageState extends State<EditProfilePage> {
         const SnackBar(content: Text('Profile berhasil diupdate!')),
       );
 
-      final UserModel updatedUser = UserModel(
-        id: widget.user.id,
-        name: _nameController.text.trim(),
-        email: widget.user.email,
-        jenisKelamin: widget.user.jenisKelamin,
-        batchId: widget.user.batchId,
-        trainingId: widget.user.trainingId,
-        profilePhoto: widget.user.profilePhoto,
-      );
-
-      Navigator.pop(context, updatedUser);
-
+      // Kembalikan 'true' agar ProfilePage melakukan fetch ulang ke server,
+      // sehingga data yang ditampilkan 100% konsisten dengan database.
+      Navigator.pop(context, true);
     } on DioException catch (e) {
-      debugPrint('XXX Update profile error: ${e.response?.statusCode} '
-          '${e.response?.data}');
+      debugPrint(
+        'XXX Update profile error: ${e.response?.statusCode} ${e.response?.data}',
+      );
       String errorMessage = 'Gagal update profile: Terjadi kesalahan jaringan.';
       if (e.response != null) {
         if (e.response!.statusCode == 422) {
           final errors = e.response?.data['errors'];
           final msg = e.response?.data['message'];
-          if (errors != null) {
-            errorMessage = 'Gagal update profile (422): $errors';
-          } else if (msg != null) {
-            errorMessage = 'Gagal update profile (422): $msg';
-          } else {
-            errorMessage = 'Gagal update profile: Data tidak valid (422).';
-          }
+          errorMessage = errors != null
+              ? 'Gagal update profile (422): $errors'
+              : 'Gagal update profile (422): ${msg ?? 'Data tidak valid'}';
         } else if (e.response!.statusCode == 401) {
-          errorMessage = 'Gagal update profile: Sesi habis, silakan login ulang.';
+          errorMessage =
+              'Gagal update profile: Sesi habis, silakan login ulang.';
         } else if (e.response!.statusCode == 500) {
-          errorMessage = 'Gagal update profile: Terjadi kesalahan pada server (500).';
+          errorMessage =
+              'Gagal update profile: Terjadi kesalahan pada server (500).';
         } else {
-          errorMessage = 'Gagal update profile (${e.response!.statusCode}): '
-              '${e.response?.data['message'] ?? e.message}';
+          errorMessage =
+              'Gagal update profile (${e.response!.statusCode}): ${e.response?.data['message'] ?? e.message}';
         }
       }
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(errorMessage)));
     } catch (e, st) {
       debugPrint('XXX Update profile exception: $e\n$st');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal update profile: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal update profile: $e')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  String? _validateEmail(String? val) {
+    if (val == null || val.trim().isEmpty) return 'Email tidak boleh kosong';
+    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    if (!emailRegex.hasMatch(val.trim())) return 'Format email tidak valid';
+    return null;
+  }
+
+  String _photoUrl(String value) {
+    return value.startsWith('http')
+        ? value
+        : 'https://appabsensi.mobileprojp.com/storage/$value';
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit Profile")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Center(
-                    child: Stack(
-                      children: [
-                        // Gunakan ClipOval + Image.network dengan errorBuilder
-                        // agar error 403/404 dari server ditampilkan sebagai
-                        // fallback icon — tidak melempar exception ke console.
-                        ClipOval(
-                          child: SizedBox(
-                            width: 100,
-                            height: 100,
-                            child: _imageFile != null
-                                // Foto baru dari galeri — tampil dari file lokal
-                                ? Image.file(
-                                    _imageFile!,
-                                    fit: BoxFit.cover,
-                                  )
-                                : (widget.user.profilePhoto != null &&
-                                        widget.user.profilePhoto!.isNotEmpty
-                                    // Foto dari server — pakai errorBuilder agar
-                                    // 403/404 tidak crash
-                                    ? Image.network(
-                                        widget.user.profilePhoto!.startsWith('http')
-                                            ? widget.user.profilePhoto!
-                                            : 'https://appabsensi.mobileprojp.com/storage/${widget.user.profilePhoto}',
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          debugPrint('[ProfilePhoto] Gagal memuat gambar: $error');
-                                          return const Icon(Icons.person, size: 50);
-                                        },
-                                      )
-                                    // Tidak ada foto — tampil icon default
-                                    : const Icon(Icons.person, size: 50)),
-                          ),
+      backgroundColor: const Color(0xFFF8F9FA),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: 250,
+                  pinned: true,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Container(
+                      padding: const EdgeInsets.fromLTRB(20, 80, 20, 24),
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color(0xFF2196F3),
+                            Color(0xFF00BCD4),
+                          ],
                         ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: _pickImage,
-                            child: CircleAvatar(
-                              radius: 18,
-                              backgroundColor: Theme.of(context).primaryColor,
-                              child: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          _buildAvatar(),
+                          const SizedBox(height: 12),
+                          const Text(
+                            "Edit Profile",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.all(20.0),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _buildFormCard(),
+                            const SizedBox(height: 26),
+                            _buildSaveButton(),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ]),
                   ),
-                  const SizedBox(height: 24),
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: "Name",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      prefixIcon: const Icon(Icons.person),
+                ),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildAvatar() {
+    return Center(
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          ClipOval(
+            child: Container(
+              width: 76,
+              height: 76,
+              color: Colors.transparent,
+              child: _imageFile != null
+                  ? Image.file(_imageFile!, fit: BoxFit.cover)
+                  : (widget.user.profilePhoto != null &&
+                            widget.user.profilePhoto!.isNotEmpty
+                        ? Image.network(
+                            _photoUrl(widget.user.profilePhoto!),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              debugPrint(
+                                '[ProfilePhoto] Gagal memuat gambar: $error',
+                              );
+                              return const Icon(
+                                Icons.person,
+                                size: 46,
+                                color: _textDark,
+                              );
+                            },
+                          )
+                        : const Icon(Icons.person, size: 46, color: _textDark)),
+            ),
+          ),
+          Positioned(
+            right: -8,
+            bottom: -2,
+            child: InkWell(
+              onTap: _pickImage,
+              borderRadius: BorderRadius.circular(18),
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: _cardBg,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.12),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
                     ),
-                    validator: (val) => val!.isEmpty ? "Nama tidak boleh kosong" : null,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: "Email",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      prefixIcon: const Icon(Icons.email),
-                    ),
-                    validator: (val) => val!.isEmpty ? "Email tidak boleh kosong" : null,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: "Password (Kosongkan jika tidak diubah)",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      prefixIcon: const Icon(Icons.lock),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    initialValue: _jenisKelamin,
-                    decoration: InputDecoration(
-                      labelText: "Jenis Kelamin",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      prefixIcon: const Icon(Icons.transgender),
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 'L', child: Text('Laki-laki')),
-                      DropdownMenuItem(value: 'P', child: Text('Perempuan')),
-                    ],
-                    onChanged: (val) => setState(() => _jenisKelamin = val!),
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _batchIdController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: "Batch ID",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      prefixIcon: const Icon(Icons.badge),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _trainingIdController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: "Training ID",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                      prefixIcon: const Icon(Icons.school),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  ElevatedButton(
-                    onPressed: _isLoading ? null : _updateProfile,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : const Text("Save Changes", style: TextStyle(fontSize: 16)),
-                  ),
-                ],
+                  ],
+                ),
+                child: const Icon(
+                  Icons.camera_alt,
+                  size: 17,
+                  color: _primaryPurple,
+                ),
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+      ),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+      child: Column(
+        children: [
+          _profileField(
+            icon: Icons.person,
+            child: TextFormField(
+              controller: _nameController,
+              style: const TextStyle(
+                color: _textDark,
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+              ),
+              decoration: const InputDecoration(labelText: 'Nama'),
+              validator: (val) => val == null || val.trim().isEmpty
+                  ? 'Nama tidak boleh kosong'
+                  : null,
+            ),
+          ),
+          _divider(),
+          _profileField(
+            icon: Icons.email,
+            child: TextFormField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              style: const TextStyle(
+                color: _textDark,
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+              ),
+              decoration: const InputDecoration(labelText: 'Email'),
+              validator: _validateEmail,
+            ),
+          ),
+          _divider(),
+          _profileField(
+            icon: Icons.lock,
+            child: TextFormField(
+              controller: _passwordController,
+              obscureText: true,
+              style: const TextStyle(
+                color: _textDark,
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+              ),
+              decoration: const InputDecoration(
+                labelText: 'Password',
+                hintText: 'Kosongkan jika tidak diubah',
+                hintStyle: TextStyle(
+                  color: _labelGrey,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+          _divider(),
+          _profileField(
+            icon: Icons.transgender,
+            child: DropdownButtonFormField<String>(
+              initialValue: _jenisKelamin,
+              isExpanded: true,
+              decoration: const InputDecoration(labelText: 'Jenis Kelamin'),
+              dropdownColor: _cardBg,
+              iconEnabledColor: _primaryPurple,
+              style: const TextStyle(
+                color: _textDark,
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+              ),
+              items: const [
+                DropdownMenuItem(value: 'L', child: Text('L')),
+                DropdownMenuItem(value: 'P', child: Text('P')),
+              ],
+              onChanged: (val) => setState(() => _jenisKelamin = val ?? 'L'),
+            ),
+          ),
+          _divider(),
+          _profileField(
+            icon: Icons.badge,
+            child: TextFormField(
+              controller: _batchIdController,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(
+                color: _textDark,
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+              ),
+              decoration: const InputDecoration(labelText: 'Batch ID'),
+            ),
+          ),
+          _divider(),
+          _profileField(
+            icon: Icons.school,
+            child: _isLoadingTrainings
+                ? const Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: LinearProgressIndicator(minHeight: 2),
+                  )
+                : DropdownButtonFormField<int>(
+                    value: _selectedTrainingId,
+                    isExpanded: true,
+                    decoration: const InputDecoration(labelText: 'Training'),
+                    dropdownColor: _cardBg,
+                    iconEnabledColor: _primaryPurple,
+                    style: const TextStyle(
+                      color: _textDark,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
+                    items:
+                        _trainings
+                            ?.map(
+                              (t) => DropdownMenuItem<int>(
+                                value: t.id,
+                                child: Text(t.title ?? '-'),
+                              ),
+                            )
+                            .toList() ??
+                        [],
+                    onChanged: (val) =>
+                        setState(() => _selectedTrainingId = val),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _profileField({required IconData icon, required Widget child}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 34,
+            child: Icon(icon, color: _iconBlueGrey, size: 22),
+          ),
+          const SizedBox(width: 4),
+          Expanded(child: child),
+        ],
+      ),
+    );
+  }
+
+  Widget _divider() {
+    return const Divider(
+      height: 18,
+      thickness: 1,
+      color: _dividerColor,
+      indent: 36,
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return SizedBox(
+      height: 54,
+      child: ElevatedButton.icon(
+        onPressed: _isLoading ? null : _updateProfile,
+        icon: _isLoading
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              )
+            : const Icon(Icons.save, size: 18, color: Colors.white),
+        label: Text(
+          _isLoading ? 'Saving...' : 'Save Changes',
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF2196F3),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 2,
         ),
       ),
     );

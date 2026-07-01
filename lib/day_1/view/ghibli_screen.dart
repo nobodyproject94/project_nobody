@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_nobody/day_1/extension/extension_navigator.dart';
 import 'package:project_nobody/day_1/models/ghibli.dart';
 import 'package:project_nobody/day_1/services/api_services.dart';
-import 'package:project_nobody/day_1/services/dio_client.dart';
+import 'package:project_nobody/day_1/tugas_15/services/dio_client.dart';
 import 'package:project_nobody/day_1/view/ghibli_detail_screen.dart';
 
 class GhibliScreen extends StatefulWidget {

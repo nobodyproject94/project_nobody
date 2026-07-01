@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:project_nobody/day_1/models/auth_response.dart';
-import 'package:project_nobody/day_1/models/profile_response.dart';
+import 'package:project_nobody/day_1/tugas_15/models/auth_response.dart';
+import 'package:project_nobody/day_1/tugas_15/models/profile_response.dart';
 import 'package:retrofit/retrofit.dart';
 
 @RestApi(baseUrl: 'https://absensib1.mobileprojp.com')

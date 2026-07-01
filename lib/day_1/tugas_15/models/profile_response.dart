@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:project_nobody/day_1/models/user_model.dart';
+import 'package:project_nobody/day_1/tugas_15/models/user_model.dart';
 
 part 'profile_response.g.dart';
 

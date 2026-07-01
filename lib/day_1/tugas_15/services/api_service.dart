@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import '../models/auth_response.dart';
 import '../models/login_response.dart';
+import '../models/training_response.dart';
 
 part 'api_service.g.dart';
 
@@ -23,9 +24,12 @@ abstract class ApiService {
   @GET('/api/profile')
   Future<AuthResponse> getProfile();
 
-  /// Update nama profil.
-  /// Body HANYA: { "name": "string" }
-  /// Field lain (email, jenis_kelamin, dll) TIDAK didukung → 422.
+  /// Ambil list data training
+  @GET('/api/trainings')
+  Future<TrainingResponse> getTrainings();
+
+  /// Update profil.
+  /// Body: name, email, jenis_kelamin, batch_id, training_id, dll.
   @PUT('/api/profile')
   Future<AuthResponse> updateProfile(@Body() Map<String, dynamic> body);
 

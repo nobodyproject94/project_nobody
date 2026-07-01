@@ -1,18 +1,20 @@
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:project_nobody/day_1/services/dio_client.dart';
-import 'package:project_nobody/day_1/services/token_services.dart';
-import '../../services/api_service.dart';
-import 'profile_page.dart';
+import 'package:flutter/material.dart';
+
+import '../services/api_service.dart';
+import '../services/dio_client.dart';
+import '../services/token_services.dart';
+import '../utils/absensi_ui.dart';
+import 'dashboard_page.dart';
 import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -20,125 +22,139 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
-  void _login() async {
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  String? _requiredEmail(String? value) {
+    final text = value?.trim() ?? '';
+    if (text.isEmpty) return 'Email tidak boleh kosong';
+    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(text)) return 'Format email tidak valid';
+    return null;
+  }
+
+  String? _requiredPassword(String? value) {
+    final text = value ?? '';
+    if (text.isEmpty) return 'Password tidak boleh kosong';
+    if (text.length < 6) return 'Password minimal 6 karakter';
+    return null;
+  }
+
+  Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
     try {
-      final dio = createDioClient();
-      final apiService = ApiService(dio);
-
+      final apiService = ApiService(createDioClient());
       final body = {
-        "email": _emailController.text,
-        "password": _passwordController.text,
+        'email': _emailController.text.trim(),
+        'password': _passwordController.text,
       };
 
       final response = await apiService.login(body);
-      log(response.toString());
+      log('Login response: $response');
       final token = response.data?.token;
 
-      if (token != null) {
-        // Simpan token via TokenStorage agar interceptor dio_client dapat membacanya
-        await TokenStorage.saveToken(token);
+      if (token == null || token.isEmpty) {
+        throw Exception('Token tidak diterima dari server.');
+      }
 
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const ProfilePage()),
-        );
-      } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Login gagal: Token tidak diterima")),
-        );
-      }
-    } on DioException catch (e) {
-      String errorMessage = "Gagal login: Terjadi kesalahan jaringan.";
-      if (e.response != null) {
-        if (e.response!.statusCode == 500) {
-          errorMessage = "Gagal login: Terjadi kesalahan pada server (500). Coba lagi nanti.";
-        } else if (e.response!.statusCode == 401 || e.response!.statusCode == 404) {
-          errorMessage = "Gagal login: Email atau password salah.";
-        } else {
-          errorMessage = "Gagal login: ${e.response?.data['message'] ?? e.message}";
-        }
-      }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage)));
-    } catch (e) {
-      ScaffoldMessenger.of(
+      await TokenStorage.saveToken(token);
+      if (!mounted) return;
+      Navigator.pushAndRemoveUntil(
         context,
-      ).showSnackBar(SnackBar(content: Text("Gagal login: $e")));
+        MaterialPageRoute(builder: (_) => const DashboardPage()),
+        (_) => false,
+      );
+    } on DioException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_dioErrorMessage(e))));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal login: ${e.toString().replaceFirst('Exception: ', '')}')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  String _dioErrorMessage(DioException e) {
+    if (e.response == null) return 'Gagal login: Terjadi kesalahan jaringan.';
+    final status = e.response!.statusCode;
+    if (status == 401 || status == 404) return 'Gagal login: email atau password salah.';
+    if (status == 422) return 'Gagal login: ${extractApiMessage(e.response?.data, 'Data login tidak valid.')}';
+    if (status == 500) return 'Gagal login: server sedang bermasalah (500).';
+    return 'Gagal login: ${extractApiMessage(e.response?.data, e.message ?? 'Terjadi kesalahan.')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Icon(Icons.lock_person, size: 64, color: Colors.blueGrey),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: "Email",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: const Icon(Icons.email),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 30),
+              Container(
+                height: 84,
+                width: 84,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(28),
+                  gradient: const LinearGradient(colors: [AbsensiColors.primary, AbsensiColors.secondary]),
+                ),
+                child: const Icon(Icons.fingerprint_rounded, color: Colors.white, size: 46),
+              ),
+              const SizedBox(height: 26),
+              const Text('ABSENSI PPKD', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 8),
+              const Text('Masuk untuk mencatat kehadiran secara real-time berbasis lokasi.'),
+              const SizedBox(height: 28),
+              AbsensiCard(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        decoration: absensiInputDecoration('Email', Icons.email_rounded),
+                        validator: _requiredEmail,
                       ),
-                      validator: (val) => val!.isEmpty ? "Email tidak boleh kosong" : null,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: const Icon(Icons.lock),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword,
+                        textInputAction: TextInputAction.done,
+                        onFieldSubmitted: (_) => _login(),
+                        decoration: absensiInputDecoration('Password', Icons.lock_rounded).copyWith(
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscurePassword ? Icons.visibility_rounded : Icons.visibility_off_rounded),
+                            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                          ),
+                        ),
+                        validator: _requiredPassword,
                       ),
-                      validator: (val) => val!.isEmpty ? "Password tidak boleh kosong" : null,
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _login,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      const SizedBox(height: 24),
+                      PrimaryButton(label: 'Login', icon: Icons.login_rounded, loading: _isLoading, onPressed: _login),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: _isLoading
+                            ? null
+                            : () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const RegisterPage())),
+                        child: const Text('Belum punya akun? Register di sini'),
                       ),
-                      child: _isLoading
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text("Login", style: TextStyle(fontSize: 16)),
-                    ),
-                    const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => const RegisterPage()),
-                        );
-                      },
-                      child: const Text("Belum punya akun? Register di sini"),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),

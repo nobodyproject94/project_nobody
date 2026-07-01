@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../models/user_model.dart';
-import '../../services/api_service.dart';
-import '../../services/dio_client.dart';
-import '../../services/token_services.dart';
+import '../models/user_model.dart';
+import '../models/training_model.dart';
+import '../services/api_service.dart';
+import '../services/dio_client.dart';
+import '../services/token_services.dart';
 import 'edit_profile_page.dart';
 import 'login_page.dart';
 
@@ -15,6 +16,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   UserModel? _user;
+  List<TrainingModel>? _trainings;
   bool _isLoading = true;
   String? _error;
 
@@ -35,10 +37,18 @@ class _ProfilePageState extends State<ProfilePage> {
       final dio = createDioClient();
       final apiService = ApiService(dio);
       // Token disisipkan otomatis oleh interceptor di dio_client.dart
-      final response = await apiService.getProfile();
+
+      final profileFuture = apiService.getProfile();
+      final trainingsFuture = apiService.getTrainings().catchError((e) => null);
+
+      final response = await profileFuture;
+      final trainingsResponse = await trainingsFuture;
 
       setState(() {
         _user = response.data ?? response.user;
+        if (trainingsResponse != null) {
+          _trainings = trainingsResponse.data;
+        }
         _isLoading = false;
       });
     } catch (e) {
@@ -62,158 +72,211 @@ class _ProfilePageState extends State<ProfilePage> {
     _fetchProfile(showLoading: showLoading);
   }
 
+  String _getTrainingTitle(int? id) {
+    if (id == null) return "-";
+    if (_trainings == null) return id.toString();
+    try {
+      final t = _trainings!.firstWhere((t) => t.id == id);
+      return t.title ?? id.toString();
+    } catch (e) {
+      return id.toString();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Profile Dashboard"),
-        actions: [
-          IconButton(icon: const Icon(Icons.logout), onPressed: _logout),
-        ],
-      ),
-      body: _buildBody(),
-    );
-  }
-
-  Widget _buildBody() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    } else if (_error != null) {
-      return Center(child: Text("Error: $_error"));
-    } else if (_user == null) {
-      return const Center(child: Text("Data profil tidak ditemukan"));
-    }
-
-    final user = _user!;
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // ClipOval + Image.network dengan errorBuilder:
-          // Jika foto gagal dimuat (403/404/dll), tampilkan ikon fallback
-          // tanpa melempar exception berulang ke console.
-          ClipOval(
-            child: SizedBox(
-              width: 100,
-              height: 100,
-              child: user.profilePhoto != null && user.profilePhoto!.isNotEmpty
-                  ? Image.network(
-                      user.profilePhoto!.startsWith('http')
-                          ? user.profilePhoto!
-                          : 'https://appabsensi.mobileprojp.com/storage/${user.profilePhoto}',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        debugPrint('[ProfilePhoto] Gagal memuat gambar: $error');
-                        return const Icon(Icons.person, size: 50);
-                      },
-                    )
-                  : const Icon(Icons.person, size: 50),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildProfileItem(
-                    Icons.person,
-                    "Nama",
-                    user.name ?? "-",
-                  ),
-                  const Divider(),
-                  _buildProfileItem(
-                    Icons.email,
-                    "Email",
-                    user.email ?? "-",
-                  ),
-                  const Divider(),
-                  _buildProfileItem(
-                    Icons.transgender,
-                    "Jenis Kelamin",
-                    user.jenisKelamin == 'L'
-                        ? 'Laki-laki'
-                        : (user.jenisKelamin == 'P' ? 'Perempuan' : '-'),
-                  ),
-                  const Divider(),
-                  _buildProfileItem(
-                    Icons.badge,
-                    "Batch ID",
-                    user.batchId?.toString() ?? "-",
-                  ),
-                  const Divider(),
-                  _buildProfileItem(
-                    Icons.school,
-                    "Training ID",
-                    user.trainingId?.toString() ?? "-",
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.edit),
-            label: const Text("Edit Profile"),
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => EditProfilePage(user: user),
-                ),
-              );
-              if (result != null && result is UserModel) {
-                setState(() {
-                  _user = result;
-                });
-                _refreshProfile(showLoading: false); // Refresh to get latest photo/data silently
-              } else if (result == true) {
-                _refreshProfile();
-              }
-            },
-          ),
-        ],
-      ),
+      backgroundColor: const Color(0xFFF8F9FA),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(child: Text("Error: $_error"))
+              : _user == null
+                  ? const Center(child: Text("Data profil tidak ditemukan"))
+                  : CustomScrollView(
+                      slivers: [
+                        SliverAppBar(
+                          expandedHeight: 250,
+                          pinned: true,
+                          leading: IconButton(
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          actions: [
+                            IconButton(
+                              icon: const Icon(Icons.logout, color: Colors.white),
+                              onPressed: _logout,
+                            ),
+                          ],
+                          flexibleSpace: FlexibleSpaceBar(
+                            background: Container(
+                              padding: const EdgeInsets.fromLTRB(20, 80, 20, 24),
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xFF2196F3), // AbsensiColors.primary fallback
+                                    Color(0xFF00BCD4), // AbsensiColors.secondary fallback
+                                  ],
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 3),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ClipOval(
+                                      child: _user!.profilePhoto != null && _user!.profilePhoto!.isNotEmpty
+                                          ? Image.network(
+                                              _user!.profilePhoto!.startsWith('http')
+                                                  ? _user!.profilePhoto!
+                                                  : 'https://appabsensi.mobileprojp.com/storage/${_user!.profilePhoto}',
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) => const Icon(Icons.person, size: 50, color: Colors.grey),
+                                            )
+                                          : Container(
+                                              color: Colors.white,
+                                              child: const Icon(Icons.person, size: 50, color: Colors.grey),
+                                            ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    _user!.name ?? "Peserta PPKD",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        SliverPadding(
+                          padding: const EdgeInsets.all(20.0),
+                          sliver: SliverList(
+                            delegate: SliverChildListDelegate([
+                              Card(
+                                elevation: 0,
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  side: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      _buildProfileItem(Icons.person, "Nama", _user!.name ?? "-"),
+                                      const Divider(height: 24),
+                                      _buildProfileItem(Icons.email, "Email", _user!.email ?? "-"),
+                                      const Divider(height: 24),
+                                      _buildProfileItem(
+                                        Icons.transgender,
+                                        "Jenis Kelamin",
+                                        _user!.jenisKelamin == 'L' ? 'Laki-laki' : (_user!.jenisKelamin == 'P' ? 'Perempuan' : '-'),
+                                      ),
+                                      const Divider(height: 24),
+                                      _buildProfileItem(
+                                        Icons.badge,
+                                        "Batch ID",
+                                        _user!.batchId?.toString() ?? "-",
+                                      ),
+                                      const Divider(height: 24),
+                                      _buildProfileItem(
+                                        Icons.school,
+                                        "Training",
+                                        _getTrainingTitle(_user!.trainingId),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              ElevatedButton.icon(
+                                icon: const Icon(Icons.edit, color: Colors.white),
+                                label: const Text("Edit Profile", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF2196F3),
+                                  minimumSize: const Size(double.infinity, 54),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 2,
+                                ),
+                                onPressed: () async {
+                                  final result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => EditProfilePage(user: _user!)),
+                                  );
+                                  if (result != null && result is UserModel) {
+                                    setState(() {
+                                      _user = result;
+                                    });
+                                  } else if (result == true) {
+                                    _refreshProfile();
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 40),
+                            ]),
+                          ),
+                        ),
+                      ],
+                    ),
     );
   }
 
   Widget _buildProfileItem(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.blueGrey),
-          const SizedBox(width: 16),
-          Column(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2196F3).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: const Color(0xFF2196F3), size: 24),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.w500),
               ),
+              const SizedBox(height: 4),
               Text(
                 value,
                 style: const TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
                 ),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
