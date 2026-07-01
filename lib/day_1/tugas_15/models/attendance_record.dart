@@ -32,7 +32,7 @@ class AttendanceRecord {
       return double.tryParse(value.toString());
     }
 
-    String? asString(dynamic value) => value == null ? null : value.toString();
+    String? asString(dynamic value) => value?.toString();
 
     return AttendanceRecord(
       id: json['id'] is int ? json['id'] : int.tryParse('${json['id'] ?? ''}'),

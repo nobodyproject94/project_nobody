@@ -446,7 +446,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: LinearProgressIndicator(minHeight: 2),
                   )
                 : DropdownButtonFormField<int>(
-                    value: _selectedTrainingId,
+                    initialValue: _selectedTrainingId,
                     isExpanded: true,
                     decoration: const InputDecoration(labelText: 'Training'),
                     dropdownColor: _cardBg,

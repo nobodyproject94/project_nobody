@@ -162,7 +162,7 @@ class _AttendanceHistoryPageState extends State<AttendanceHistoryPage> {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       itemCount: _records.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final record = _records[index];
         return AbsensiCard(

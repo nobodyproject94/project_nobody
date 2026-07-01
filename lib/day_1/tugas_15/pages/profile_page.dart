@@ -46,10 +46,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
       setState(() {
         _user = response.data ?? response.user;
-        if (trainingsResponse != null) {
-          _trainings = trainingsResponse.data;
-        }
-        _isLoading = false;
+        _trainings = trainingsResponse.data;
+              _isLoading = false;
       });
     } catch (e) {
       setState(() {

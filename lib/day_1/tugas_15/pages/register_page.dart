@@ -175,7 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
-                        value: _jenisKelamin,
+                        initialValue: _jenisKelamin,
                         isExpanded: true,
                         decoration: absensiInputDecoration('Jenis Kelamin', Icons.transgender_rounded),
                         items: const [
@@ -195,7 +195,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       _loadingTrainings
                           ? const Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator())
                           : DropdownButtonFormField<int>(
-                              value: _selectedTrainingId,
+                              initialValue: _selectedTrainingId,
                               isExpanded: true,
                               decoration: absensiInputDecoration('Training', Icons.school_rounded),
                               items: _trainings
